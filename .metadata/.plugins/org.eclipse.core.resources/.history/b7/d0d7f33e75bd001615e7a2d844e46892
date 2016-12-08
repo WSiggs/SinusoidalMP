@@ -1,0 +1,172 @@
+
+package org.usfirst.frc.team4908.robot;
+
+import java.text.DecimalFormat;
+
+import org.usfirst.frc.team4908.robot.drive.DuxDrive;
+import org.usfirst.frc.team4908.robot.motion.ProfileGenerator;
+
+import edu.wpi.first.wpilibj.CANTalon;
+import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.Joystick;
+
+public class Robot extends IterativeRobot 
+{	
+	public static double startTime;
+	public static double currentTime;
+	public static int count;
+	
+	public static DecimalFormat df;
+	
+	
+	Encoder rightEncoder;
+    Encoder leftEncoder;
+    
+    CANTalon frontLeft;
+	CANTalon frontRight;
+	CANTalon backLeft;
+	CANTalon backRight;
+		
+	Joystick stick1;
+    Joystick stick2;
+    
+    DuxDrive drive;
+    
+    boolean wasPressed = false;
+    
+    int driveCommand;
+    
+    public double maxLeft = 8.6;
+    public double maxRight = 9.1;
+    public double currentLeft;
+    public double currentRight;
+    
+    private static final double rearLeftDiameter = 7.202;
+    private static final double rearRightDiameter = 7.2115;
+    private static final double frontLeftDiameter = 0;
+    private static final double frontRightDiameter = 0;
+    
+    ProfileGenerator pg;
+    
+    double kA;
+    double kV;
+    
+    double kP;
+    double kI;
+    double kD;
+    
+    double kVD;
+    double kAD;
+	
+    public void robotInit() 
+    {
+    	frontLeft = new CANTalon(1);
+    	frontRight = new CANTalon(2);
+    	backLeft = new CANTalon(4);
+    	backRight = new CANTalon(3);        
+        
+        stick1 = new Joystick(0);
+        stick2 = new Joystick(1);
+        
+        leftEncoder = new Encoder(3, 2, true);
+        leftEncoder.setDistancePerPulse(((2*Math.PI) / 1440)*(rearLeftDiameter/2.0)); // radians per pulse
+        leftEncoder.setSamplesToAverage(64);
+        rightEncoder = new Encoder(7, 6, false);
+        rightEncoder.setDistancePerPulse(((2*Math.PI) / 1440)*(rearRightDiameter/2.0));
+        rightEncoder.setSamplesToAverage(64);
+        
+    	drive = new DuxDrive(frontLeft, backLeft, frontRight, backRight);
+
+    	pg = new ProfileGenerator(3.0, 10.0);
+    	
+    	df = new DecimalFormat("0.000");
+    	
+    	kA = 1.0/pg.getAcceleration();
+    	kV = 1.0/Math.min(maxLeft, maxRight);
+    	
+    	driveCommand = 0; 
+    	
+    	kVD = 0.5;
+    	kAD = 0.5;
+
+    }
+    
+    /**
+     * This function is called periodically during operator control
+     */
+    public void teleopPeriodic() 
+    {
+    	currentLeft = leftEncoder.getRate();
+        currentRight = rightEncoder.getRate();
+
+    	
+        if(stick2.getRawButton(1) && !wasPressed)
+        {
+        	rightEncoder.reset();
+        	leftEncoder.reset();
+        	
+        	wasPressed = true;
+        	driveCommand = 1;
+        	startTime = System.currentTimeMillis()/1000.0;
+        }
+        
+        if(stick1.getRawButton(1))
+        {
+        	driveCommand = 0;
+        	wasPressed = false;
+        }
+        
+        switch(driveCommand)
+        {
+        	case 0:
+        		drive.duxArcadeDrive(stick1.getRawAxis(1), stick1.getRawAxis(2));
+        		break;
+        	case 1:
+        		mpDrive((System.currentTimeMillis()/1000.0) - startTime);
+        		time = (System.currentTimeMillis()/1000.0) - startTime;
+        		break;
+        	default:
+        		break;
+        }
+        
+        
+        if(currentLeft > maxLeft)
+        {
+        	maxLeft = currentLeft;
+        }
+        
+        if(currentRight > maxRight)
+        {
+        	maxRight = currentRight;
+        }
+
+    }
+    
+    public static void main(String[] args)
+    {
+    	ProfileGenerator pg = new ProfileGenerator(5.0, 6.2);
+    	
+    	df = new DecimalFormat("#0.000");
+    	
+    	startTime = (System.currentTimeMillis()/1000.0);
+    	
+    	count = 0;    	
+    	System.out.println(pg.getTotalTime());
+    	
+    	while(currentTime < pg.getTotalTime())
+    	{	
+    		currentTime = System.currentTimeMillis()/1000.0-startTime;
+    		//if(count >= 10000)
+    		{
+    			
+    			System.out.println("Time: " + df.format(currentTime) + " " + df.format(pg.getValues(currentTime).acceleration)
+    					+ " " + df.format(pg.getValues(currentTime).velocity) + " " + df.format(pg.getValues(currentTime).position));
+    			count = 0;
+    		}
+    		
+    		count++;
+    	}
+    }
+
+}

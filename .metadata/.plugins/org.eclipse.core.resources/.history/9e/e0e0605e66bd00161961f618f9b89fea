@@ -1,0 +1,52 @@
+
+package org.usfirst.frc.team4908.robot;
+
+import java.text.DecimalFormat;
+
+import org.usfirst.frc.team4908.robot.motion.ProfileGenerator;
+
+import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+public class Robot extends IterativeRobot 
+{	
+	public static double startTime;
+	public static double currentTime;
+	
+	public static DecimalFormat df;
+	
+    public void robotInit() 
+    {
+    	
+    }
+    
+    /**
+     * This function is called periodically during operator control
+     */
+    public void teleopPeriodic() 
+    {
+        
+    }
+    
+    public static void main(String[] args)
+    {
+    	ProfileGenerator pg = new ProfileGenerator(3.0, 10.0);
+    	
+    	df = new DecimalFormat("#0.000");
+    	
+    	startTime = (System.currentTimeMillis()/1000.0);
+    	currentTime = startTime;
+    	
+    	
+    	
+    	while(currentTime <= pg.getTotalTime())
+    	{
+    		currentTime = (System.currentTimeMillis()/1000.0)-startTime;
+    		System.out.println("Time: " + df.format(currentTime) + pg.getValues(currentTime).toString());
+    	
+    	}
+    }
+
+}

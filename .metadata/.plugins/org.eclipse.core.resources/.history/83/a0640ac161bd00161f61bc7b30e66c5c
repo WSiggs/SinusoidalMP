@@ -1,0 +1,21 @@
+package org.usfirst.frc.team4908.robot.motion;
+
+public class ProfileGenerator 
+{
+	
+	private double kT;
+	private double k1;
+	private double k2;
+	private double k3;
+	
+	public ProfileGenerator(double acc, double target)
+	{
+		generate(acc, target);
+	}
+	
+	public void generate(double acceleration, double target)
+	{
+		kT = Math.sqrt((2.0*Math.PI*target)/acceleration);
+		k1 = ((2.0*Math.PI)/kT);
+	}
+}

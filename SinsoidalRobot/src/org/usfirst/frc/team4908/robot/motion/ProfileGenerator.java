@@ -40,7 +40,7 @@ public class ProfileGenerator
 	
 	public Setpoint getValues(double time)
 	{
-		setpoint.acceleration = (acc*Math.sin(k1*time));
+		setpoint.acceleration = (acceleration*Math.sin(k1*time));
 		setpoint.velocity = (k2*(1-(Math.cos(k1*time))));
 		setpoint.position = (k2*(time-(k3*Math.sin(k1*time))));
 		
@@ -54,6 +54,6 @@ public class ProfileGenerator
 	
 	public double getAcceleration()
 	{
-		return acc;
+		return acceleration;
 	}
 }

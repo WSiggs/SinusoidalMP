@@ -8,21 +8,24 @@ public class ProfileGenerator
 	private double k2;
 	private double k3;
 	
-	private double acc;
+	private double velocity;
+	private double acceleration;
 	
 	double maxStep;
 	
 	Setpoint setpoint;
 	
-	public ProfileGenerator(double acc, double target)
+	public ProfileGenerator(double velocity, double target)
 	{
-		this.acc = acc;
+		this.velocity = velocity;
 		setpoint = new Setpoint();
-		generate(acc, target);
+		generate(velocity, target);
 	}
 	
-	public void generate(double acceleration, double target)
+	public void generate(double velocity, double target)
 	{
+		acceleration = ((Math.pow(Math.PI*velocity, 2))/(2.0*Math.PI*target));
+		
 		kT = Math.sqrt((2.0*Math.PI*target)/acceleration);
 		k1 = ((2.0*Math.PI)/kT);
 		k2 = (acceleration/k1);
